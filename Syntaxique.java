@@ -12,14 +12,9 @@ Syntaxique() throws Exception {
 }
 
       void ProgrammeAlgoLang(Token token) throws IOException {
-            // if (token.id.equals("kw")&&token.value.equals("programme")) {
-                  printTokens();
-            // }
+            printTokens();
+            
       }
-
-
-
-
 
       void addAllTokens() throws IOException {
             String line;

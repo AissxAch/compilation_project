@@ -10,4 +10,7 @@ public class Token {
     public String toString() {
         return id + " : " + value;
     }
+    public String getNom(){
+        return value;
+    }  
 }

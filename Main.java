@@ -1,6 +1,6 @@
 public class Main {
       public static void main(String[] args) throws Exception  {
-            Functions start = new Functions();
+            Func start = new Func();
             start.startLexicalCompiler();
             Syntaxique syntaxique = new Syntaxique();
             syntaxique.addAllTokens();
