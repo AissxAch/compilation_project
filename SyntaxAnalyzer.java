@@ -59,7 +59,16 @@ public class SyntaxAnalyzer {
         match("id"); // <NomProgramme>
         match("cs"); // ;
         parseCorps();
-        match("cs"); // .
+        if (currentToken != null && currentToken.getType().equals("cs") && currentToken.value.equals(";")) {
+            match("cs"); // ;
+            if (currentToken != null && currentToken.getType().equals("kw") && currentToken.value.equals("fin")) {
+                match("kw"); // fin
+                
+                }
+            match("cs"); // .
+        }else{
+            match("cs"); // .
+        }
     }
 
     private void parseCorps() throws SyntaxError {
@@ -137,6 +146,7 @@ public class SyntaxAnalyzer {
             parseInstruction();
         }
         match("kw"); // fin
+        
     }
 
     private void parseInstruction() throws SyntaxError {
@@ -212,6 +222,11 @@ public class SyntaxAnalyzer {
         parseCondition(); // Parse the condition
         match("kw"); // faire
         parseInstruction(); // Parse the instruction
+        if (currentToken != null && currentToken.getType().equals("kw") && currentToken.value.equals("fin")) {
+            match("kw"); // fin
+            match("cs"); // ;
+            
+        }
     }
 
     private void parseCondition() throws SyntaxError {
