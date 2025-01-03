@@ -2,6 +2,7 @@ programme p2p;
 constante k = 10;
 variable k,v2a,xx3 : entier; ex9q,x5g : caractere;
 debut
+      x=y*3;
       x:=-10;
       tx2 := 15;
       tantque

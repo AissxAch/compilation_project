@@ -1,9 +1,12 @@
 public class Main {
       public static void main(String[] args) throws Exception  {
-            Functions start = new Functions();
+            Func start = new Func();
             start.startLexicalCompiler();
-            Syntaxique syntaxique = new Syntaxique();
-            syntaxique.addAllTokens();
-            syntaxique.ProgrammeAlgoLang(syntaxique.tokens.get(0));
+            try {
+                  new Syntaxique();
+            } catch (Exception e) {
+                  System.out.println(e.getMessage());
+            }
+            
       }
 }
