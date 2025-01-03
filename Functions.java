@@ -2,12 +2,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Func {
+public class Functions {
       BufferedReader reader;
       States states;
       static List<Character> Cs;
 
-      Func() throws Exception {
+      Functions() throws Exception {
             reader = new BufferedReader(new FileReader("test.txt"));
             states = new States();
             Cs = new ArrayList<>();
