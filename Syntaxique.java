@@ -6,10 +6,11 @@ public class Syntaxique {
     ArrayList<Token> tokens = new ArrayList<>();
     int currentTokenIndex = 0;
 
+    // Constructor: Initialize the syntax analyzer
     Syntaxique() throws Exception {
-        treader = new BufferedReader(new FileReader("token.al"));
-        addAllTokens();
-        ProgrammeAlgoLang();
+        treader = new BufferedReader(new FileReader("token.al")); // Read tokens from the file
+        addAllTokens(); // Load tokens into the list
+        ProgrammeAlgoLang(); // Start parsing the program
     }
 
     // Add all tokens from the file to the tokens list
@@ -47,13 +48,6 @@ public class Syntaxique {
             return true;
         }
         return false;
-    }
-
-    // Print all tokens for debugging
-    void printTokens() {
-        for (Token token : tokens) {
-            System.out.println(token);
-        }
     }
 
     // Grammar rule: <ProgrammeAlgoLang> ::= programme <NomProgramme> ; <Corps> .
@@ -325,5 +319,13 @@ public class Syntaxique {
             throw new Exception("Syntax Error: Expected multiplication operator (*, div, mod, or et)");
         }
         match("cs", getCurrentToken().value);
+    }
+
+    public static void main(String[] args) {
+        try {
+            new Syntaxique();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
