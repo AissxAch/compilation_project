@@ -1,16 +1,21 @@
-public class Token {
-    String id;
+class Token {
+    String type;
     String value;
 
-    Token(String id, String value) {
-        this.id = id;
+    Token(String type, String value) {
+        this.type = type;
         this.value = value;
     }
 
+    @Override
     public String toString() {
-        return id + " : " + value;
+        return "(" + type + ", " + value + ")";
     }
+<<<<<<< HEAD
     public String getNom(){
         return value;
     }  
 }
+=======
+}
+>>>>>>> 7cb13346282da23d5193b8bda3076fdc9682d71b

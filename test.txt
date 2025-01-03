@@ -1,7 +1,8 @@
-programme p2p;
-constante k = 10;
-variable k,v2a,xx3 : entier; ex9q,x5g : caractere;
+programme example;
+constante pi => 3.14;
+variable x, y : entier; z : caractere;
 debut
+<<<<<<< HEAD
       x=y*3;
       x:=-10;
       tx2 := 15;
@@ -9,3 +10,11 @@ debut
             x= x-1;
       faire x = 0
 fin
+=======
+    x := 10;
+    y := x * 2;
+    z := 'A';
+    tantque x > 0 faire
+        x := x - 1;
+fin.
+>>>>>>> 7cb13346282da23d5193b8bda3076fdc9682d71b
