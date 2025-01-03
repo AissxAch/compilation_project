@@ -9,20 +9,20 @@ public class SyntaxAnalyzer {
     private int currentTokenIndex;
     private Token currentToken;
 
-    public SyntaxAnalyzer(String tokenFilePath) throws IOException {
+    public SyntaxAnalyzer(String filename) throws IOException {
         tokens = new ArrayList<>();
-        loadTokens(tokenFilePath);
+        loadTokens(filename);
         currentTokenIndex = 0;
         currentToken = tokens.get(currentTokenIndex);
     }
 
-    private void loadTokens(String tokenFilePath) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(tokenFilePath));
+    private void loadTokens(String filename) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
         String line;
         while ((line = reader.readLine()) != null) {
-            String[] parts = line.split(",");
-            String id = parts[0].trim();
-            String value = parts[1].trim();
+            String[] parts = line.split(", ");
+            String id = parts[0].substring(1);
+            String value = parts[1].substring(0, parts[1].length() - 1);
             tokens.add(new Token(id, value));
         }
         reader.close();
@@ -33,15 +33,16 @@ public class SyntaxAnalyzer {
         if (currentTokenIndex < tokens.size()) {
             currentToken = tokens.get(currentTokenIndex);
         } else {
-            currentToken = null; // End of tokens
+            currentToken = null;
         }
     }
 
-    private void match(String expectedTokenType) throws SyntaxError {
-        if (currentToken != null && currentToken.id.equals(expectedTokenType)) {
+    private void match(String expectedType) throws SyntaxError {
+        System.out.println("Matching: Expected " + expectedType + ", Found " + currentToken.id + " " + currentToken.value);
+        if (currentToken != null && currentToken.getType().equals(expectedType)) {
             advance();
         } else {
-            throw new SyntaxError("Expected " + expectedTokenType + " but found " + (currentToken != null ? currentToken.id : "EOF"));
+            throw new SyntaxError("Expected " + expectedType + " but found " + (currentToken != null ? currentToken.getType() + " " + currentToken.value : "end of input"));
         }
     }
 
@@ -50,103 +51,100 @@ public class SyntaxAnalyzer {
         if (currentToken != null) {
             throw new SyntaxError("Unexpected token at the end: " + currentToken);
         }
-        System.out.println("Parsing completed successfully.");
+        System.out.println("Syntax analysis completed successfully.");
     }
 
     private void parseProgram() throws SyntaxError {
-        match("kw"); // Match 'program'
-        match("id"); // Match program name
-        match("cs"); // Match ';'
+        match("kw"); // programme
+        match("id"); // <NomProgramme>
+        match("cs"); // ;
         parseCorps();
-        match("cs"); // Match '.'
+        match("cs"); // .
     }
 
     private void parseCorps() throws SyntaxError {
-        if (currentToken != null && currentToken.value.equals("constante")) {
+        if (currentToken != null && currentToken.getType().equals("kw") && currentToken.value.equals("constante")) {
             parsePartieDefinitionConstante();
         }
-        if (currentToken != null && currentToken.value.equals("variable")) {
+        if (currentToken != null && currentToken.getType().equals("kw") && currentToken.value.equals("variable")) {
             parsePartieDefinitionVariable();
         }
         parseInstrComp();
     }
 
     private void parsePartieDefinitionConstante() throws SyntaxError {
-        match("kw"); // Match 'constante'
+        match("kw"); // constante
         parseDefinitionConstante();
-        while (currentToken != null && currentToken.value.equals("constante")) {
+        while (currentToken != null && currentToken.getType().equals("id")) {
             parseDefinitionConstante();
         }
     }
 
     private void parseDefinitionConstante() throws SyntaxError {
-        match("id"); // Match constant name
-        match("cs"); // Match '='
+        match("id"); // <NomConstante>
+        match("cs"); // =>
         parseConstante();
-        match("cs"); // Match ';'
+        match("cs"); // ;
     }
 
     private void parseConstante() throws SyntaxError {
-        if (currentToken != null && currentToken.id.equals("con")) {
-            match("con"); // Match constant value
-        } else if (currentToken != null && currentToken.id.equals("id")) {
-            match("id"); // Match constant name
+        if (currentToken != null && currentToken.getType().equals("con")) {
+            match("con"); // <Nombre>
+        } else if (currentToken != null && currentToken.getType().equals("id")) {
+            match("id"); // <NomConstante>
         } else {
-            throw new SyntaxError("Expected constant value or name but found " + (currentToken != null ? currentToken.id : "EOF"));
+            throw new SyntaxError("Expected constant or identifier but found " + (currentToken != null ? currentToken.getType() + " " + currentToken.value : "end of input"));
         }
     }
 
     private void parsePartieDefinitionVariable() throws SyntaxError {
-        match("kw"); // Match 'variable'
+        match("kw"); // variable
         parseDefinitionVariable();
-        while (currentToken != null && currentToken.value.equals("variable")) {
+        while (currentToken != null && currentToken.getType().equals("id")) {
             parseDefinitionVariable();
         }
     }
 
     private void parseDefinitionVariable() throws SyntaxError {
         parseGroupeVariable();
-        match("cs"); // Match ';'
-    }
-    
-    private void parseGroupeVariable() throws SyntaxError {
-        parseNomVariable();
-        while (currentToken != null && currentToken.value.equals(",")) {
-            match("cs"); // Match ','
-            parseNomVariable();
-        }
-        match("cs"); // Match ':'
-        parseNomType(); // Parse the type (e.g., Entier, Caractère, Réel)
+        match("cs"); // ;
     }
 
-    private void parseNomVariable() throws SyntaxError {
-        match("id"); // Match variable name
+    private void parseGroupeVariable() throws SyntaxError {
+        match("id"); // <NomVariable>
+        while (currentToken != null && currentToken.getType().equals("cs") && currentToken.value.equals(",")) {
+            match("cs"); // ,
+            match("id"); // <NomVariable>
+        }
+        match("cs"); // :
+        parseNomType();
     }
 
     private void parseNomType() throws SyntaxError {
-        if (currentToken != null && (currentToken.value.equals("Entier") || currentToken.value.equals("Caractère") || currentToken.value.equals("Réel"))) {
-            match("kw"); // Match type
+        if (currentToken != null && currentToken.getType().equals("kw") && 
+            (currentToken.value.equals("Entier") || currentToken.value.equals("Caractère") || currentToken.value.equals("Réel"))) {
+            match("kw"); // <NomType>
         } else {
-            throw new SyntaxError("Expected type but found " + (currentToken != null ? currentToken.value : "EOF"));
+            throw new SyntaxError("Expected type keyword but found " + (currentToken != null ? currentToken.getType() + " " + currentToken.value : "end of input"));
         }
     }
 
     private void parseInstrComp() throws SyntaxError {
-        match("kw"); // Match 'debut'
+        match("kw"); // debut
         parseInstruction();
-        while (currentToken != null && currentToken.value.equals(";")) {
-            match("cs"); // Match ';'
+        while (currentToken != null && currentToken.getType().equals("cs") && currentToken.value.equals(";")) {
+            match("cs"); // ;
             parseInstruction();
         }
-        match("kw"); // Match 'fin'
+        match("kw"); // fin
     }
 
     private void parseInstruction() throws SyntaxError {
-        if (currentToken != null && currentToken.id.equals("id")) {
+        if (currentToken != null && currentToken.getType().equals("id")) {
             parseInstructionAffectation();
-        } else if (currentToken != null && currentToken.value.equals("tantque")) {
+        } else if (currentToken != null && currentToken.getType().equals("kw") && currentToken.value.equals("tantque")) {
             parseInstructionTantque();
-        } else if (currentToken != null && currentToken.value.equals("debut")) {
+        } else if (currentToken != null && currentToken.getType().equals("kw") && currentToken.value.equals("debut")) {
             parseInstrComp();
         } else {
             // Empty instruction (Vide)
@@ -154,100 +152,87 @@ public class SyntaxAnalyzer {
     }
 
     private void parseInstructionAffectation() throws SyntaxError {
-        parseNomVariable();
-        match("cs"); // Match ':='
+        match("id"); // <NomVariable>
+        match("cs"); // :=
         parseExpression();
     }
 
     private void parseExpression() throws SyntaxError {
         parseExpressionSimple();
-        if (currentToken != null && (currentToken.value.equals("<") || currentToken.value.equals(">") || currentToken.value.equals("=") || currentToken.value.equals("<=") || currentToken.value.equals(">=") || currentToken.value.equals("<>"))) {
-            parseOperateurRelationnel();
+        if (currentToken != null && currentToken.getType().equals("cs") && 
+            (currentToken.value.equals("<") || currentToken.value.equals(">") || currentToken.value.equals("=") || 
+             currentToken.value.equals("<=") || currentToken.value.equals(">=") || currentToken.value.equals("<>"))) {
+            match("cs"); // <OperateurRelationnel>
             parseExpressionSimple();
         }
     }
 
     private void parseExpressionSimple() throws SyntaxError {
-        if (currentToken != null && (currentToken.value.equals("+") || currentToken.value.equals("-"))) {
-            parseOperateurSigne();
+        if (currentToken != null && currentToken.getType().equals("cs") && 
+            (currentToken.value.equals("+") || currentToken.value.equals("-"))) {
+            match("cs"); // <OperateurSigne>
         }
         parseTerme();
-        while (currentToken != null && (currentToken.value.equals("+") || currentToken.value.equals("-") || currentToken.value.equals("ou"))) {
-            parseOperateurAddition();
+        while (currentToken != null && currentToken.getType().equals("cs") && 
+               (currentToken.value.equals("+") || currentToken.value.equals("-") || currentToken.value.equals("ou"))) {
+            match("cs"); // <OperateurAddition>
             parseTerme();
         }
     }
 
     private void parseTerme() throws SyntaxError {
         parseFacteur();
-        while (currentToken != null && (currentToken.value.equals("*") || currentToken.value.equals("div") || currentToken.value.equals("mod") || currentToken.value.equals("et"))) {
-            parseOperateurMult();
+        while (currentToken != null && currentToken.getType().equals("cs") && 
+               (currentToken.value.equals("*") || currentToken.value.equals("div") || currentToken.value.equals("mod") || currentToken.value.equals("et"))) {
+            match("cs"); // <OperateurMult>
             parseFacteur();
         }
     }
 
     private void parseFacteur() throws SyntaxError {
-        if (currentToken != null && currentToken.id.equals("con")) {
-            match("con"); // Match constant
-        } else if (currentToken != null && currentToken.id.equals("id")) {
-            match("id"); // Match variable
-        } else if (currentToken != null && currentToken.value.equals("(")) {
-            match("cs"); // Match '('
+        if (currentToken != null && currentToken.getType().equals("con")) {
+            match("con"); // <Constante>
+        } else if (currentToken != null && currentToken.getType().equals("id")) {
+            match("id"); // <NomVariable>
+        } else if (currentToken != null && currentToken.getType().equals("cs") && currentToken.value.equals("(")) {
+            match("cs"); // (
             parseExpression();
-            match("cs"); // Match ')'
-        } else {
-            throw new SyntaxError("Expected constant, variable, or expression but found " + (currentToken != null ? currentToken.id : "EOF"));
+            match("cs"); // )
+        } else if (currentToken != null && currentToken.getType().equals("kw")) {
+            
         }
-    }
-
-    private void parseOperateurRelationnel() throws SyntaxError {
-        if (currentToken != null && (currentToken.value.equals("<") || currentToken.value.equals(">") || currentToken.value.equals("=") || currentToken.value.equals("<=") || currentToken.value.equals(">=") || currentToken.value.equals("<>"))) {
-            match("cs"); // Match relational operator
-        } else {
-            throw new SyntaxError("Expected relational operator but found " + (currentToken != null ? currentToken.value : "EOF"));
-        }
-    }
-
-    private void parseOperateurSigne() throws SyntaxError {
-        if (currentToken != null && (currentToken.value.equals("+") || currentToken.value.equals("-"))) {
-            match("cs"); // Match sign operator
-        } else {
-            throw new SyntaxError("Expected sign operator but found " + (currentToken != null ? currentToken.value : "EOF"));
-        }
-    }
-
-    private void parseOperateurAddition() throws SyntaxError {
-        if (currentToken != null && (currentToken.value.equals("+") || currentToken.value.equals("-") || currentToken.value.equals("ou"))) {
-            match("cs"); // Match addition operator
-        } else {
-            throw new SyntaxError("Expected addition operator but found " + (currentToken != null ? currentToken.value : "EOF"));
-        }
-    }
-
-    private void parseOperateurMult() throws SyntaxError {
-        if (currentToken != null && (currentToken.value.equals("*") || currentToken.value.equals("div") || currentToken.value.equals("mod") || currentToken.value.equals("et"))) {
-            match("cs"); // Match multiplication operator
-        } else {
-            throw new SyntaxError("Expected multiplication operator but found " + (currentToken != null ? currentToken.value : "EOF"));
+        
+        else {
+            throw new SyntaxError("Expected constant, variable, or expression but found " + (currentToken != null ? currentToken.getType() + " " + currentToken.value : "end of input"));
         }
     }
 
     private void parseInstructionTantque() throws SyntaxError {
-        match("kw"); // Match 'tantque'
-        parseCondition();
-        match("kw"); // Match 'faire'
-        parseInstruction();
+        match("kw"); // tantque
+        parseCondition(); // Parse the condition
+        match("kw"); // faire
+        parseInstruction(); // Parse the instruction
     }
 
     private void parseCondition() throws SyntaxError {
-        parseExpression();
-        parseOperateurRelationnel();
-        parseExpression();
-    }
-}
+        parseExpression(); // Parse the first expression
 
-class SyntaxError extends Exception {
-    public SyntaxError(String message) {
-        super(message);
+        // Debugging: Print the current token
+        System.out.println("Current Token in parseCondition: " + (currentToken != null ? currentToken.getType() + " " + currentToken.value : "null"));
+
+        // Match the relational operator
+        if (currentToken != null && currentToken.getType().equals("cs") &&
+            (currentToken.value.equals("<") || currentToken.value.equals(">") ||
+             currentToken.value.equals("=") || currentToken.value.equals("<=") ||
+             currentToken.value.equals(">=") || currentToken.value.equals("<>"))) {
+            match("cs"); // Match the relational operator
+        } else if (currentToken != null && currentToken.getType().equals("kw")) {
+            
+        }
+        else {
+            throw new SyntaxError("Expected relational operator but found " + (currentToken != null ? currentToken.getType() + " " + currentToken.value : "end of input"));
+        }
+
+        parseExpression(); // Parse the second expression
     }
 }

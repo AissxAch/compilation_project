@@ -1,7 +1,11 @@
-programme Test;
-constante PS = 34;
-variable x, y : Entier;
+programme Example ;
+constante MaxValue = 100;
+variable a, b, sum : Entier ;
 debut
-    x := 5;
-    y := x + 10;
+    a := 10;
+    b := 20;
+    sum := a + b;
+    tantque sum < MaxValue faire
+        sum := sum + 1;
+    fin;
 fin.

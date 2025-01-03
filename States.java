@@ -9,40 +9,40 @@ public class States {
     }
 
     void state0(Character c, BufferedReader reader) throws IOException {
-      Token = "";
-      Functions.mark(reader);
-      Token += c;
-      switch (c) {
-          case 'p': state1(reader); break; // programme
-          case 'c': state14(reader); break; // constante, caractère
-          case 'v': state29(reader); break; // variable
-          case 'e': state36(reader); break; // entier
-          case 't': state41(reader); break; // tantque
-          case 'd': state48(reader); break; // debut, div
-          case 'f': state53(reader); break; // fin, faire
-          case 'm': state55(reader); break; // mod
-          case 'o': state66(reader); break; // ou
-          case '<': state11(reader); break;
-          case '>': state12(reader); break;
-          case '=': state13(reader); break;
-          case '+': case '-': case '*': state13(reader); break;
-          case ';': case ':': case ',': case '(': case ')': case '.': state65(reader); break;
-          default:
-              if (Functions.lettre(c)) {
-                  // Check if the token is a type keyword (Entier, Caractère, Réel)
-                  if (c == 'E' || c == 'C' || c == 'R') {
-                      stateTypeKeyword(reader); // Handle type keywords
-                  } else {
-                      state10(reader); // Handle identifiers
-                  }
-              } else if (Functions.chiffre(c)) {
-                  state63(reader); // Handle numbers
-              } else {
-                  Functions.error(c); // Handle invalid characters
-              }
-              break;
-      }
-  }
+        Token = "";
+        Functions.mark(reader);
+        Token += c;
+        switch (c) {
+            case 'p': state1(reader); break; // programme
+            case 'c': state14(reader); break; // constante, caractère
+            case 'v': state29(reader); break; // variable
+            case 'e': state36(reader); break; // entier
+            case 't': state41(reader); break; // tantque
+            case 'd': state48(reader); break; // debut, div
+            case 'f': state53(reader); break; // fin, faire
+            case 'm': state55(reader); break; // mod
+            case 'o': state66(reader); break; // ou
+            case '<': state11(reader); break;
+            case '>': state12(reader); break;
+            case '=': state13(reader); break;
+            case '+': case '-': case '*': state13(reader); break;
+            case ';': case ':': case ',': case '(': case ')': case '.': state65(reader); break; // Handle special characters
+            default:
+                if (Functions.lettre(c)) {
+                    // Check if the token is a type keyword (Entier, Caractère, Réel)
+                    if (c == 'E' || c == 'C' || c == 'R') {
+                        stateTypeKeyword(reader); // Handle type keywords
+                    } else {
+                        state10(reader); // Handle identifiers
+                    }
+                } else if (Functions.chiffre(c)) {
+                    state63(reader); // Handle numbers
+                } else {
+                    Functions.error(c); // Handle invalid characters
+                }
+                break;
+        }
+    }
   
   void stateTypeKeyword(BufferedReader reader) throws IOException {
       // Read characters until the end of the keyword or an invalid character is found
@@ -162,8 +162,8 @@ public class States {
         Character c = Functions.ChercherCar(reader);
         if (c == '$' || Character.isWhitespace(c) || Functions.isCs(c)) {
             if (Functions.isCs(c)) reader.reset();
-            System.out.println("(id," + Token + ")");
-            writer.write("(id," + Token + ")\n");
+            System.out.println("(id, " + Token + ")");
+            writer.write("(id, " + Token + ")\n");
         } else if (Functions.chiffre(c)) {
             Token += c;
             state10(reader);
@@ -183,8 +183,8 @@ public class States {
             state11(reader);
         } else if (!Functions.isCs(c) || c == ';') {
             reader.reset();
-            System.out.println("(cs," + Token + ")");
-            writer.write("(cs," + Token + ")\n");
+            System.out.println("(cs, " + Token + ")");
+            writer.write("(cs, " + Token + ")\n");
         } else {
             Functions.error(c);
         }
@@ -198,8 +198,8 @@ public class States {
             state12(reader);
         } else if (!Functions.isCs(c)) {
             reader.reset();
-            System.out.println("(cs," + Token + ")");
-            writer.write("(cs," + Token + ")\n");
+            System.out.println("(cs, " + Token + ")");
+            writer.write("(cs, " + Token + ")\n");
         } else {
             Functions.error(c);
         }
@@ -210,8 +210,8 @@ public class States {
         Character c = Functions.ChercherCar(reader);
         if (!Functions.isCs(c)) {
             reader.reset();
-            System.out.println("(cs," + Token + ")");
-            writer.write("(cs," + Token + ")\n");
+            System.out.println("(cs, " + Token + ")");
+            writer.write("(cs, " + Token + ")\n");
         } else {
             Functions.error(c);
         }
@@ -752,8 +752,8 @@ public class States {
         Character c = Functions.ChercherCar(reader);
         if (c == '$' || Character.isWhitespace(c) || Functions.isCs(c)) {
             if (Functions.isCs(c)) reader.reset();
-            System.out.println("(con," + Token + ")");
-            writer.write("(con," + Token + ")\n");
+            System.out.println("(con, " + Token + ")");
+            writer.write("(con, " + Token + ")\n");
         } else if (Functions.chiffre(c)) {
             Token += c;
             state63(reader);
@@ -775,39 +775,29 @@ public class States {
           Functions.errorz(reader, Token);
       } else {
           reader.reset();
-          System.out.println("(kw," + Token + ")");
-          writer.write("(kw," + Token + ")\n");
+          System.out.println("(kw, " + Token + ")");
+          writer.write("(kw, " + Token + ")\n");
       }
   }
 
   void state65(BufferedReader reader) throws IOException {
-      if (Token.equals(":")) {
-          Character c = Functions.ChercherCar(reader);
-          if (c == '=') {
-              Token += c; // Append '=' to ':'
-              System.out.println("(cs," + Token + ")"); // Debug statement
-              writer.write("(cs," + Token + ")\n");
-          } else {
-              reader.reset();
-              System.out.println("(cs," + Token + ")"); // Debug statement
-              writer.write("(cs," + Token + ")\n");
-          }
-      } else if (Token.equals("=")) {
-          Character c = Functions.ChercherCar(reader);
-          if (c == '>') {
-              Token += c; // Append '>' to '='
-              System.out.println("(cs," + Token + ")"); // Debug statement
-              writer.write("(cs," + Token + ")\n");
-          } else {
-              reader.reset();
-              System.out.println("(cs," + Token + ")"); // Debug statement
-              writer.write("(cs," + Token + ")\n");
-          }
-      } else {
-          System.out.println("(cs," + Token + ")"); // Debug statement
-          writer.write("(cs," + Token + ")\n");
-      }
-  }
+    if (Token.equals(":")) {
+        Character c = Functions.ChercherCar(reader);
+        if (c == '=') {
+            Token += c; // Combine `:` and `=`
+            System.out.println("(cs, " + Token + ")");
+            writer.write("(cs, " + Token + ")\n");
+        } else {
+            reader.reset();
+            System.out.println("(cs, " + Token + ")");
+            writer.write("(cs, " + Token + ")\n");
+        }
+    } else {
+        System.out.println("(cs, " + Token + ")");
+        writer.write("(cs, " + Token + ")\n");
+    }
+}
+
 
     void state66(BufferedReader reader) throws IOException {
         Character c = Functions.ChercherCar(reader);
@@ -831,8 +821,8 @@ public class States {
             Functions.errorz(reader, Token);
         } else {
             reader.reset();
-            System.out.println("(kw," + Token + ")");
-            writer.write("(kw," + Token + ")\n");
+            System.out.println("(kw, " + Token + ")");
+            writer.write("(kw, " + Token + ")\n");
         }
     }
 

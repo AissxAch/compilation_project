@@ -42,11 +42,11 @@ public class Functions {
     static boolean lettre(Character c) {
         return Character.isLetter(c); // Simplified
     }
-
+    
     static boolean chiffre(Character c) {
         return Character.isDigit(c); // Simplified
     }
-
+    
     static boolean isCs(Character c) {
         return Cs.contains(c);
     }
