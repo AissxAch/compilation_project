@@ -2,26 +2,26 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class Syntaxique {
-    BufferedReader treader;
     ArrayList<Token> tokens = new ArrayList<>();
     int currentTokenIndex = 0;
 
-    // Constructor: Initialize the syntax analyzer
+    // Constructor: Initialize the syntax analyzer and read tokens from token.al
     Syntaxique() throws Exception {
-        treader = new BufferedReader(new FileReader("token.al")); // Read tokens from the file
-        addAllTokens(); // Load tokens into the list
-        ProgrammeAlgoLang(); // Start parsing the program
+        readTokensFromFile("token.al");
+        ProgrammeAlgoLang();
     }
 
-    // Add all tokens from the file to the tokens list
-    void addAllTokens() throws IOException {
-        String line;
-        while ((line = treader.readLine()) != null) {
-            String[] parts = line.split(",");
-            parts[0] = parts[0].substring(1); // Remove the '('
-            parts[1] = parts[1].substring(0, parts[1].length() - 1); // Remove the ')'
-            Token token = new Token(parts[0], parts[1]);
-            tokens.add(token);
+    // Read tokens from the token.al file
+    void readTokensFromFile(String filename) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Remove the parentheses and split into type and value
+                line = line.substring(1, line.length() - 1); // Remove '(' and ')'
+                String[] parts = line.split(", ");
+                Token token = new Token(parts[0], parts[1]);
+                tokens.add(token);
+            }
         }
     }
 
@@ -319,13 +319,5 @@ public class Syntaxique {
             throw new Exception("Syntax Error: Expected multiplication operator (*, div, mod, or et)");
         }
         match("cs", getCurrentToken().value);
-    }
-
-    public static void main(String[] args) {
-        try {
-            new Syntaxique();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
     }
 }
