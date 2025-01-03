@@ -1,10 +1,7 @@
-programme example;
-constante pi => 3.14;
-variable x, y : entier; z : caractere;
+programme Test;
+constante PS = 34;
+variable x, y : Entier;
 debut
-    x := 10;
-    y := x * 2;
-    z := 'A';
-    tantque x > 0 faire
-        x := x - 1;
+    x := 5;
+    y := x + 10;
 fin.
